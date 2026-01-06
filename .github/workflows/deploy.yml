@@ -35,7 +35,7 @@ jobs:
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
           ssh -i deploy_key -o StrictHostKeyChecking=no \
-            Conphoserv@${SERVER_HOST} \
+            Owner@${SERVER_HOST} \
             "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
@@ -48,7 +48,7 @@ jobs:
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
           ssh -i deploy_key -o StrictHostKeyChecking=no \
-            Conphoserv@${SERVER_HOST} \
+            Owner@${SERVER_HOST} \
             "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
@@ -61,7 +61,7 @@ jobs:
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
           ssh -i deploy_key -o StrictHostKeyChecking=no \
-            Conphoserv@${SERVER_HOST} \
+            Owner@${SERVER_HOST} \
             "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
