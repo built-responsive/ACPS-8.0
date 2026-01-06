@@ -35,7 +35,7 @@ function Deploy-Local {
 function Deploy-Staging {
     Write-Status "Deploying to STAGING (v2.acps.dev)..." "Yellow"
     
-    $host = $config.environments.staging.host
+    $hostname = $config.environments.staging.host
     $user = $config.environments.staging.user
     $path = $config.environments.staging.path
     
@@ -44,13 +44,13 @@ function Deploy-Staging {
         Write-Status "Using rsync for staging deploy..."
         
         $excludeArgs = $config.exclude | ForEach-Object { "--exclude='$_'" }
-        $rsyncCmd = "rsync -avz --delete $($excludeArgs -join ' ') ./ ${user}@${host}:${path}"
+        $rsyncCmd = "rsync -avz --delete $($excludeArgs -join ' ') ./ ${user}@${hostname}:${path}"
         
         Invoke-Expression $rsyncCmd
         
         # Run post-deploy commands
         Write-Status "Running post-deploy commands..."
-        ssh "${user}@${host}" "cd $path && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
+        ssh "${user}@${hostname}" "cd $path && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
         
     } else {
         Write-Status "rsync not found. Install Git Bash or WSL for remote deploy." "Red"
@@ -63,7 +63,7 @@ function Deploy-Staging {
 function Deploy-Production {
     Write-Status "Deploying to PRODUCTION (acps.alleycatphoto.net)..." "Red"
     
-    $host = $config.environments.production.host
+    $hostname = $config.environments.production.host
     $user = $config.environments.production.user
     $path = $config.environments.production.path
     
@@ -78,7 +78,7 @@ function Deploy-Production {
     if ($config.environments.production.backup) {
         Write-Status "Creating production backup..."
         $backupDate = Get-Date -Format "yyyyMMdd_HHmmss"
-        ssh "${user}@${host}" "cp -r $path ${path}_backup_${backupDate}"
+        ssh "${user}@${hostname}" "cp -r $path ${path}_backup_${backupDate}"
     }
     
     # Deploy
@@ -86,13 +86,13 @@ function Deploy-Production {
         Write-Status "Deploying to production..."
         
         $excludeArgs = $config.exclude | ForEach-Object { "--exclude='$_'" }
-        $rsyncCmd = "rsync -avz --delete $($excludeArgs -join ' ') ./ ${user}@${host}:${path}"
+        $rsyncCmd = "rsync -avz --delete $($excludeArgs -join ' ') ./ ${user}@${hostname}:${path}"
         
         Invoke-Expression $rsyncCmd
         
         # Post-deploy
         Write-Status "Running post-deploy commands..."
-        ssh "${user}@${host}" "cd $path && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
+        ssh "${user}@${hostname}" "cd $path && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
         
     } else {
         Write-Status "rsync not found. Install Git Bash or WSL for remote deploy." "Red"
