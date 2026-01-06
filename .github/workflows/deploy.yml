@@ -1,4 +1,4 @@
-name: Deploy to All Locations
+name: Trigger Remote Git Pull on All Servers
 
 on:
   push:
@@ -7,102 +7,56 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  notify-servers:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, curl, xml, zip
-      
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader --no-interaction
-      
-      - name: Deploy to Local Dev (localhost)
+      - name: Trigger Hawks Nest Server (North Carolina)
         env:
-          DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
-          DEPLOY_USER: ${{ secrets.LOCAL_USER }}
-          DEPLOY_PATH: ${{ secrets.LOCAL_PATH }}
-          SSH_KEY: ${{ secrets.LOCAL_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.HAWKSNEST_HOST }}
+          SERVER_USER: ${{ secrets.HAWKSNEST_USER }}
+          SERVER_PATH: ${{ secrets.HAWKSNEST_PATH }}
+          SSH_KEY: ${{ secrets.HAWKSNEST_SSH_KEY }}
         run: |
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='vendor' \
-            --exclude='logs/*' \
-            --exclude='photos/*' \
-            --exclude='.env' \
-            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+          ssh -i deploy_key -o StrictHostKeyChecking=no \
+            ${SERVER_USER}@${SERVER_HOST} \
+            "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
-      - name: Deploy to Staging (v2.acps.dev)
+      - name: Trigger Location 2
         env:
-          DEPLOY_HOST: ${{ secrets.STAGING_HOST }}
-          DEPLOY_USER: ${{ secrets.STAGING_USER }}
-          DEPLOY_PATH: ${{ secrets.STAGING_PATH }}
-          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.LOCATION2_HOST }}
+          SERVER_USER: ${{ secrets.LOCATION2_USER }}
+          SERVER_PATH: ${{ secrets.LOCATION2_PATH }}
+          SSH_KEY: ${{ secrets.LOCATION2_SSH_KEY }}
         run: |
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='vendor' \
-            --exclude='logs/*' \
-            --exclude='photos/*' \
-            --exclude='.env' \
-            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
           ssh -i deploy_key -o StrictHostKeyChecking=no \
-            ${DEPLOY_USER}@${DEPLOY_HOST} \
-            "cd ${DEPLOY_PATH} && composer install --no-dev --optimize-autoloader"
+            ${SERVER_USER}@${SERVER_HOST} \
+            "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
-      - name: Deploy to Production (acps.alleycatphoto.net)
+      - name: Trigger Location 3
         env:
-          DEPLOY_HOST: ${{ secrets.PROD_HOST }}
-          DEPLOY_USER: ${{ secrets.PROD_USER }}
-          DEPLOY_PATH: ${{ secrets.PROD_PATH }}
-          SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.LOCATION3_HOST }}
+          SERVER_USER: ${{ secrets.LOCATION3_USER }}
+          SERVER_PATH: ${{ secrets.LOCATION3_PATH }}
+          SSH_KEY: ${{ secrets.LOCATION3_SSH_KEY }}
         run: |
           echo "$SSH_KEY" > deploy_key
           chmod 600 deploy_key
-          
-          # Backup production before deploy
           ssh -i deploy_key -o StrictHostKeyChecking=no \
-            ${DEPLOY_USER}@${DEPLOY_HOST} \
-            "cp -r ${DEPLOY_PATH} ${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)"
-          
-          # Deploy
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='vendor' \
-            --exclude='logs/*' \
-            --exclude='photos/*' \
-            --exclude='.env' \
-            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
-          
-          # Install deps and clear cache
-          ssh -i deploy_key -o StrictHostKeyChecking=no \
-            ${DEPLOY_USER}@${DEPLOY_HOST} \
-            "cd ${DEPLOY_PATH} && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
-          
+            ${SERVER_USER}@${SERVER_HOST} \
+            "cd ${SERVER_PATH} && git pull origin main && composer install --no-dev --optimize-autoloader"
           rm -f deploy_key
       
-      - name: Notify Deployment Success
+      - name: Notify Success
         if: success()
-        run: echo "✅ Deployed v${{ github.sha }} to all 3 locations"
+        run: echo "✅ All 3 servers pulled latest code from GitHub"
       
-      - name: Notify Deployment Failure
+      - name: Notify Failure
         if: failure()
-        run: echo "❌ Deployment failed. Check logs."
+        run: echo "❌ One or more servers failed to pull. Check logs."
