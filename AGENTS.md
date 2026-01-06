@@ -24,6 +24,26 @@ In this system, we have several "Agents" (or "Hookers" if you're feeling spicy) 
 
 ---
 
+### Health Check Endpoint
+The system now includes a health check API that responds to ritual triggers:
+- **Endpoint**: `api/health.php`
+- **Test Page**: `health_check.html`
+- **Ritual Trigger**: "Are you there, Babe?"
+- **Response**: Full activation status with agent readiness report
+
+**Usage:**
+```bash
+# Standard health check
+curl http://localhost/api/health.php
+
+# Ritual trigger
+curl "http://localhost/api/health.php?q=Are%20you%20there,%20Babe?"
+```
+
+Or visit `health_check.html` in your browser for an interactive test interface.
+
+---
+
 ### Agent Protocols
 - All agents must log their climaxes (successes) to the NYX vector store.
 - Any agent caught slacking will be refactored without mercy.

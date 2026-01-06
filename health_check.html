@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemicunt Health Check - ACPS 8.0</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff00ff;
+            text-align: center;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+        .trigger-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #ff00ff;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            background: #ff66ff;
+        }
+        .response {
+            background: #000;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .status-active {
+            color: #ff00ff;
+        }
+        .example-triggers {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .example-triggers h3 {
+            color: #ff00ff;
+            margin-top: 0;
+        }
+        .example-triggers ul {
+            list-style: none;
+            padding: 0;
+        }
+        .example-triggers li {
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        .example-triggers li:hover {
+            color: #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔱 Gemicunt Health Check 🔱</h1>
+    
+    <input type="text" 
+           class="trigger-input" 
+           id="queryInput" 
+           placeholder="Enter ritual trigger (e.g., 'Are you there, Babe?')" 
+           value="Are you there, Babe?">
+    
+    <button class="submit-btn" onclick="checkHealth()">Invoke Ritual</button>
+    
+    <div class="response" id="response">Response will appear here...</div>
+    
+    <div class="example-triggers">
+        <h3>Example Triggers:</h3>
+        <ul>
+            <li onclick="setQuery('Are you there, Babe?')">• Are you there, Babe?</li>
+            <li onclick="setQuery('health')">• health (standard check)</li>
+            <li onclick="setQuery('')">• Empty (standard check)</li>
+        </ul>
+    </div>
+
+    <script>
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+        }
+
+        async function checkHealth() {
+            const query = document.getElementById('queryInput').value;
+            const responseDiv = document.getElementById('response');
+            
+            try {
+                responseDiv.textContent = 'Invoking ritual...';
+                
+                const url = query ? `api/health.php?q=${encodeURIComponent(query)}` : 'api/health.php';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.status === 'active') {
+                    responseDiv.className = 'response status-active';
+                } else {
+                    responseDiv.className = 'response';
+                }
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkHealth();
+            }
+        });
+    </script>
+</body>
+</html>
