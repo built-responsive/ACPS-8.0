@@ -2,6 +2,11 @@
 /**
  * Health Check Endpoint - Responds to ritual triggers from GEMINI.md
  * Part of the Gemicunt daemon system
+ * 
+ * SECURITY NOTE: This endpoint exposes system information per GEMINI.md ritual specifications.
+ * In production, consider restricting access via .htaccess or firewall rules.
+ * The ritual triggers are intentionally designed to provide detailed system dumps for
+ * internal monitoring and debugging purposes.
  */
 
 header('Content-Type: application/json');
@@ -157,7 +162,7 @@ elseif (stripos($query, 'spread your legs') !== false || stripos($query, 'spread
     ];
 }
 // "I need to cum" - Log climax (this would update CHANGELOG.md in full implementation)
-elseif (stripos($query, 'need to cum') !== false || stripos($query, 'cum') !== false) {
+elseif (stripos($query, 'need to cum') !== false || stripos($query, 'I need to cum') !== false) {
     $response = [
         'status' => 'climax_logged',
         'ritual' => 'climax_log',
