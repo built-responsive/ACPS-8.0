@@ -5,23 +5,23 @@
       "name": "Hawks Nest Server (North Carolina)",
       "host": "hawksnest.local",
       "user": "Administrator",
-      "path": "C:\\uniserver\\vhosts\\acps",
+      "path": "C:\\UniserverZ\\vhosts\\acps",
       "method": "ssh-trigger",
       "notes": "Network server in NC, git cloned already"
     },
     "location2": {
       "name": "Location 2 Server",
       "host": "TBD",
-      "user": "TBD",
-      "path": "C:\\uniserver\\vhosts\\acps",
+      "user": "Administrator",
+      "path": "C:\\UniserverZ\\vhosts\\acps",
       "method": "ssh-trigger",
       "notes": "Update host/user/path when deployed"
     },
     "location3": {
       "name": "Location 3 Server",
       "host": "TBD",
-      "user": "TBD",
-      "path": "C:\\uniserver\\vhosts\\acps",
+      "user": "Administrator",
+      "path": "C:\\UniserverZ\\vhosts\\acps",
       "method": "ssh-trigger",
       "notes": "Update host/user/path when deployed"
     }
@@ -29,15 +29,15 @@
   "github_secrets_needed": [
     "HAWKSNEST_HOST",
     "HAWKSNEST_USER",
-    "HAWKSNEST_PATH (C:\\\\uniserver\\\\vhosts\\\\acps)",
+    "HAWKSNEST_PATH (C:\\\\UniserverZ\\\\vhosts\\\\acps)",
     "HAWKSNEST_SSH_KEY (private key for SSH access)",
     "LOCATION2_HOST",
     "LOCATION2_USER",
-    "LOCATION2_PATH",
+    "LOCATION2_PATH (C:\\\\UniserverZ\\\\vhosts\\\\acps)",
     "LOCATION2_SSH_KEY",
     "LOCATION3_HOST",
     "LOCATION3_USER",
-    "LOCATION3_PATH",
+    "LOCATION3_PATH (C:\\\\UniserverZ\\\\vhosts\\\\acps)",
     "LOCATION3_SSH_KEY"
   ]
 }
