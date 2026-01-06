@@ -1,0 +1,108 @@
+name: Deploy to All Locations
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, curl, xml, zip
+      
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+      
+      - name: Deploy to Local Dev (localhost)
+        env:
+          DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
+          DEPLOY_USER: ${{ secrets.LOCAL_USER }}
+          DEPLOY_PATH: ${{ secrets.LOCAL_PATH }}
+          SSH_KEY: ${{ secrets.LOCAL_SSH_KEY }}
+        run: |
+          echo "$SSH_KEY" > deploy_key
+          chmod 600 deploy_key
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='logs/*' \
+            --exclude='photos/*' \
+            --exclude='.env' \
+            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+          rm -f deploy_key
+      
+      - name: Deploy to Staging (v2.acps.dev)
+        env:
+          DEPLOY_HOST: ${{ secrets.STAGING_HOST }}
+          DEPLOY_USER: ${{ secrets.STAGING_USER }}
+          DEPLOY_PATH: ${{ secrets.STAGING_PATH }}
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+        run: |
+          echo "$SSH_KEY" > deploy_key
+          chmod 600 deploy_key
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='logs/*' \
+            --exclude='photos/*' \
+            --exclude='.env' \
+            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+          ssh -i deploy_key -o StrictHostKeyChecking=no \
+            ${DEPLOY_USER}@${DEPLOY_HOST} \
+            "cd ${DEPLOY_PATH} && composer install --no-dev --optimize-autoloader"
+          rm -f deploy_key
+      
+      - name: Deploy to Production (acps.alleycatphoto.net)
+        env:
+          DEPLOY_HOST: ${{ secrets.PROD_HOST }}
+          DEPLOY_USER: ${{ secrets.PROD_USER }}
+          DEPLOY_PATH: ${{ secrets.PROD_PATH }}
+          SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+        run: |
+          echo "$SSH_KEY" > deploy_key
+          chmod 600 deploy_key
+          
+          # Backup production before deploy
+          ssh -i deploy_key -o StrictHostKeyChecking=no \
+            ${DEPLOY_USER}@${DEPLOY_HOST} \
+            "cp -r ${DEPLOY_PATH} ${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)"
+          
+          # Deploy
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='logs/*' \
+            --exclude='photos/*' \
+            --exclude='.env' \
+            -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+          
+          # Install deps and clear cache
+          ssh -i deploy_key -o StrictHostKeyChecking=no \
+            ${DEPLOY_USER}@${DEPLOY_HOST} \
+            "cd ${DEPLOY_PATH} && composer install --no-dev --optimize-autoloader && rm -f usps_token_cache.txt"
+          
+          rm -f deploy_key
+      
+      - name: Notify Deployment Success
+        if: success()
+        run: echo "✅ Deployed v${{ github.sha }} to all 3 locations"
+      
+      - name: Notify Deployment Failure
+        if: failure()
+        run: echo "❌ Deployment failed. Check logs."

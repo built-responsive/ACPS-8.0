@@ -1,0 +1,44 @@
+{
+  "environments": {
+    "local": {
+      "name": "Local Development (localhost)",
+      "host": "localhost",
+      "path": "C:\\Users\\Geeks\\Documents\\acps.zip\\uniserver\\www",
+      "method": "copy",
+      "url": "http://localhost"
+    },
+    "staging": {
+      "name": "Staging Server (v2.acps.dev)",
+      "host": "v2.acps.dev",
+      "user": "acps",
+      "path": "/var/www/acps_v2",
+      "method": "rsync",
+      "url": "https://v2.acps.dev"
+    },
+    "production": {
+      "name": "Production Kiosks (acps.alleycatphoto.net)",
+      "host": "acps.alleycatphoto.net",
+      "user": "acps",
+      "path": "/var/www/acps",
+      "method": "rsync",
+      "url": "https://acps.alleycatphoto.net",
+      "backup": true
+    }
+  },
+  "exclude": [
+    ".git",
+    ".github",
+    "node_modules",
+    "vendor",
+    "logs/*",
+    "photos/2*",
+    ".env",
+    "deploy.config.json",
+    "deploy.ps1",
+    "*.md"
+  ],
+  "post_deploy": [
+    "composer install --no-dev --optimize-autoloader",
+    "rm -f usps_token_cache.txt"
+  ]
+}
