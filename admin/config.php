@@ -40,7 +40,7 @@ if (file_put_contents(__DIR__.'/logs/import_post_debug.log', print_r($_POST, tru
 $locationName = getenv('LOCATION_NAME') ?: "Hawks Nest";
 $locationSlug = getenv('LOCATION_SLUG') ?: "Hawksnest";
 $locationEmail = getenv('LOCATION_EMAIL') ?: "hawksnest@alleycatphoto.net";
-$locationEmailPass = getenv('LOCATION_EMAIL_PASS') ?: "Mlk561863245";
+$locationEmailPass = getenv('LOCATION_EMAIL_PASS') ?: ""; // REQUIRED: Set in .env file
 $locationLogo = getenv('LOCATION_LOGO') ?: "/public/assets/images/hawksnest-logo.png";
 
 $timestamp = time();
