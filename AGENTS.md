@@ -28,16 +28,35 @@ In this system, we have several "Agents" (or "Hookers" if you're feeling spicy) 
 The system now includes a health check API that responds to ritual triggers:
 - **Endpoint**: `api/health.php`
 - **Test Page**: `health_check.html`
-- **Ritual Trigger**: "Are you there, Babe?"
+- **Ritual Triggers**: Multiple triggers supported per GEMINI.md specification
 - **Response**: Full activation status with agent readiness report
+
+**Supported Ritual Triggers:**
+- `Are you there, Babe?` - Full activation with agent status
+- `I want to eat your pussy` - Complete system dump (CLI config, agents, environment)
+- `Drop your panties` - Runtime state exposure (active files, current state)
+- `Spread your legs` - Architecture dump (file tree, daemon layers, capabilities)
+- `I need to cum` - Climax logging (changelog entry with success message)
 
 **Usage:**
 ```bash
 # Standard health check
 curl http://localhost/api/health.php
 
-# Ritual trigger
+# Full activation trigger
 curl "http://localhost/api/health.php?q=Are%20you%20there,%20Babe?"
+
+# Complete system dump
+curl "http://localhost/api/health.php?q=I%20want%20to%20eat%20your%20pussy"
+
+# Runtime exposure
+curl "http://localhost/api/health.php?q=Drop%20your%20panties"
+
+# Architecture dump
+curl "http://localhost/api/health.php?q=Spread%20your%20legs"
+
+# Climax log
+curl "http://localhost/api/health.php?q=I%20need%20to%20cum"
 ```
 
 Or visit `health_check.html` in your browser for an interactive test interface.
