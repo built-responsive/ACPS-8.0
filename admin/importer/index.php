@@ -156,8 +156,8 @@ $cat = unserialize($cat_raw);
         <p>&copy; Alley Cat &middot; <a href="https://www.alleycatphoto.com">alleycatphoto.com</a></p>
     </footer>
 
-    <script src="/public/assets/importer/js/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="/public/assets/importer/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    <script src="/public/assets/importer/js/jquery-3.2.1.min.js"></script>
+    <script src="/public/assets/importer/js/bootstrap.min.js"></script>
 
     <script src="/public/assets/importer/js/jquery.dm-uploader.js"></script>
     <script src="/public/assets/importer/js/ui.js"></script>
